@@ -1,0 +1,153 @@
+---
+title: "BC-Maps"
+author: "Anna Talucci"
+date: "11/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+  library(leaflet)
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(DT)
+  library(sf)
+  library(ggmap) # devtools::install_github("dkahle/ggmap")
+library(ggrepel)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(raster)
+library(rgdal)
+library(rasterVis)
+```
+
+
+```{r}
+ne1 <- 
+  raster("../NE1/NE1_HR_LC_SR_W_DR.tif")
+
+ne1
+```
+
+xmin: 273544 ymin: 369009.5 xmax: 1870570 ymax: 1735691
+```{r}
+plot(ne1)
+```
+
+```{r}
+gplot(ne1) +
+  geom_tile(aes(fill=factor(value),alpha=0.8))
+
+```
+
+
+```{r}
+fire1 <- st_read(
+  "../shapefiles/ch_R10070_2014.shp")
+```
+
+```{r}
+fire2 <- st_read(
+  "../shapefiles/en_R10171_2012.shp")
+```
+
+```{r}
+fire3 <- st_read(
+  "../shapefiles/tw_R10252_2013.shp")
+```
+
+```{r}
+all_fires= st_read("../shapefiles/perimeter_merge.shp")
+```
+
+```{r}
+str(all_fires)
+```
+
+```{r}
+bc = st_read("../shapefiles/province_bc_alber.shp")
+```
+
+```{r}
+city = st_read("../shapefiles/BC_Vancouver_PrinceGeorge.shp")
+```
+
+```{r}
+str(city)
+```
+
+```{r}
+labs <- tibble(
+  long = c(-123.1207, -122.7497),
+  lat = c(49.2827, 53.9171),
+  names = c("Vancouver", "Prince George")) 
+```
+
+```{r}
+linecolors <- c("#714C02", "#01587A", "#024E37")
+fillcolors <- c("#9D6C06", "#077DAA", "#026D4E")
+
+ggplot() + 
+  geom_sf(data = bc, fill = NA, color = "black") +
+  geom_point(data = city, aes(x = lon, y= lat), shape = 21, size = 2, color = "red", fill = "red") +
+  geom_point(data = all_fires, aes(x = lon, y= lat, color = "FIRE_YEAR", fill = "FIRE_YEAR" ), position=position_jitter(h=0.1, w=0.1),
+             shape = 21, alpha = 0.5, size = 3) +
+    scale_color_manual(values=linecolors) +
+  scale_fill_manual(values=fillcolors) +
+
+  ggtitle("Fire perimeters for study area") + 
+  coord_sf()
+```
+
+```{r}
+ggplot() + 
+  geom_sf(data = bc, fill = NA, color = "black") +
+  geom_point(data = city, aes(x = lon, y= lat), shape = 24, size = 2, color = "red", fill = "red") +
+  geom_label_repel(data = city, aes(x = lon, y= lat, label = c("Prince George", "Vancouver")), vjust = "top", hjust = "left", color = "black") +
+  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#714C02", fill = "#9D6C06", position=position_jitter(h=50, w=50)) +
+  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#024E37", fill = "#026D4E", position=position_jitter(h=-10, w=-10)) +
+  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 2, color = "#01587A", fill = "#077DAA") +
+  xlab("")+ylab("")+
+  coord_sf()
+```
+
+```{r}
+ggplot() + 
+  geom_sf(data = fire1, fill = NA, color = "brown") +
+  geom_sf(data = fire2, fill = NA, color = "yellow") +
+  geom_sf(data = fire3, fill = NA, color = "black") +
+  ggtitle("Fire perimeters for study area") + 
+  coord_sf()
+```
+
+
+
+```{r}
+ggplot() + 
+  geom_sf(data = bc, fill = NA, color = "black") +
+  geom_sf(data = city, color = "red", size = 2) +
+  geom_sf(data = fire1, fill = NA, color = "brown") +
+  geom_sf(data = fire2, fill = NA, color = "yellow") +
+  geom_sf(data = fire3, fill = NA, color = "black") +
+  ggtitle("Fire perimeters for study area") + 
+  coord_sf()
+```
+
+
+```{r}
+ggplot() + 
+  geom_sf(data = bc, fill = NA, color = "black") +
+  geom_sf(data = city, color = "red", size = 4) +
+  coord_sf()
+```
+
+
+
+
+
+
