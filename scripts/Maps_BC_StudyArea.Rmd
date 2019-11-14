@@ -9,7 +9,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Overview
 
+
+
+# Packages
 ```{r}
   library(leaflet)
   library(dplyr)
@@ -19,11 +23,12 @@ knitr::opts_chunk$set(echo = TRUE)
   library(sf)
   library(ggmap) # devtools::install_github("dkahle/ggmap")
 library(ggrepel)
-library(rnaturalearth)
-library(rnaturalearthdata)
+
 library(raster)
 library(rgdal)
 library(rasterVis)
+library(RColorBrewer)
+library(cowplot)
 ```
 
 
@@ -39,11 +44,6 @@ xmin: 273544 ymin: 369009.5 xmax: 1870570 ymax: 1735691
 plot(ne1)
 ```
 
-```{r}
-gplot(ne1) +
-  geom_tile(aes(fill=factor(value),alpha=0.8))
-
-```
 
 
 ```{r}
@@ -74,6 +74,14 @@ bc = st_read("../shapefiles/province_bc_alber.shp")
 ```
 
 ```{r}
+lakes = st_read("../shapefiles/Lakes_select_fire.shp")
+```
+
+```{r}
+parks = st_read("../shapefiles/tweed-entiako_singlepoly.shp")
+```
+
+```{r}
 city = st_read("../shapefiles/BC_Vancouver_PrinceGeorge.shp")
 ```
 
@@ -94,9 +102,8 @@ fillcolors <- c("#9D6C06", "#077DAA", "#026D4E")
 
 ggplot() + 
   geom_sf(data = bc, fill = NA, color = "black") +
-  geom_point(data = city, aes(x = lon, y= lat), shape = 21, size = 2, color = "red", fill = "red") +
-  geom_point(data = all_fires, aes(x = lon, y= lat, color = "FIRE_YEAR", fill = "FIRE_YEAR" ), position=position_jitter(h=0.1, w=0.1),
-             shape = 21, alpha = 0.5, size = 3) +
+  geom_point(data = all_fires, aes(x = lon, y= lat), position=position_jitter(h=0.1, w=0.1),
+             shape = 21, alpha = 0.5, size = 10) +
     scale_color_manual(values=linecolors) +
   scale_fill_manual(values=fillcolors) +
 
@@ -116,15 +123,77 @@ ggplot() +
   coord_sf()
 ```
 
+
 ```{r}
-ggplot() + 
+map_bc = ggplot() + 
+  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
+  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#714C02", fill = "#9D6C06", position=position_jitter(h=50, w=50)) +
+  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#024E37", fill = "#026D4E", position=position_jitter(h=-10, w=-10)) +
+  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 2, color = "#01587A", fill = "#077DAA") +
+  xlab("")+ylab("")+
+  coord_sf() +
+  theme_light()
+
+map_bc
+```
+
+ xmin: 985362 ymin: 894097.7 xmax: 1069051 ymax: 939814.2
+  xmin: 999314.8 ymin: 894097.7 xmax: 1069051 ymax: 939814.2
+```{r}
+ggplot() +
+  geom_sf(data = bc, fill = "#cfcfc4", color = "#cfcfc4") +
+    geom_sf(data = parks, fill = "#56887d", color = "#56887d") +
+    geom_sf(data = lakes, fill = "#56a0d3", color = "#56a0d3") +
+  geom_sf(data = fire1, fill = NA, color = "brown") +
+  geom_sf(data = fire2, fill = NA, color = "yellow") +
+  geom_sf(data = fire3, fill = NA, color = "black") +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
+    geom_sf(data = parks, fill = "#C3ECB2", color = "#C3ECB2") +
+    geom_sf(data = lakes, fill = "#AADAFF", color = "#AADAFF") +
+  geom_sf(data = fire1, fill = NA, color = "#F6CF65", size = 2) +
+  geom_sf(data = fire2, fill = NA, color = "#D5D8DB", size = 2) +
+  geom_sf(data = fire3, fill = NA, color = "#FFF2AF", size = 2) +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
+```
+
+```{r}
+map_fires = ggplot() +
+  geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
+    geom_sf(data = parks, fill = "#C3ECB2", color = "#C3ECB2") +
+    geom_sf(data = lakes, fill = "#AADAFF", color = "#AADAFF") +
+  geom_sf(data = fire1, fill = NA, color = "#b82b2b", size = 1) +
+  geom_sf(data = fire2, fill = NA, color = "#b06f0c", size = 1) +
+  geom_sf(data = fire3, fill = NA, color = "#dd7116", size = 1) +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
+
+map_fires
+```
+
+
+```{r}
+map_inset = 
+  ggdraw() +
+   draw_plot(map_fires) +
+  draw_plot(map_bc, x = 0.15, y = 0.14, width = .25, height = .25)
+
+map_inset
+
+```
+
+
+```{r}
+ggplot() +
   geom_sf(data = fire1, fill = NA, color = "brown") +
   geom_sf(data = fire2, fill = NA, color = "yellow") +
   geom_sf(data = fire3, fill = NA, color = "black") +
   ggtitle("Fire perimeters for study area") + 
   coord_sf()
 ```
-
 
 
 ```{r}
