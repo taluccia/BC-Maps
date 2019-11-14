@@ -29,6 +29,7 @@ library(rgdal)
 library(rasterVis)
 library(RColorBrewer)
 library(cowplot)
+library(ggspatial)
 ```
 
 
@@ -125,18 +126,35 @@ ggplot() +
 
 
 ```{r}
-map_bc = ggplot() + 
+ggplot() + 
   geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
   geom_point(data = fire1, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#714C02", fill = "#9D6C06", position=position_jitter(h=50, w=50)) +
   geom_point(data = fire2, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#024E37", fill = "#026D4E", position=position_jitter(h=-10, w=-10)) +
   geom_point(data = fire3, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 2, color = "#01587A", fill = "#077DAA") +
   xlab("")+ylab("")+
   coord_sf() +
-  theme_light()
+   theme_void() +
+  # add a bounding box so that will border the inset
+  theme(panel.background = element_rect(colour = "black", 
+                                        size = 0.5))
+
+
+```
+```{r}
+map_bc = ggplot() + 
+  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
+  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=50, w=50)) +
+  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=-10, w=-10)) +
+  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, size = 2, color = "#b82b2b", fill = "#b82b2b") +
+  xlab("")+ylab("")+
+  coord_sf() +
+   theme_void() +
+  # add a bounding box so that will border the inset
+  theme(panel.background = element_rect(colour = "black", 
+                                        size = 0.5))
 
 map_bc
 ```
-
  xmin: 985362 ymin: 894097.7 xmax: 1069051 ymax: 939814.2
   xmin: 999314.8 ymin: 894097.7 xmax: 1069051 ymax: 939814.2
 ```{r}
@@ -152,6 +170,15 @@ ggplot() +
 
 ```{r}
 ggplot() +
+  annotation_map_tile(type = "osm") +
+  geom_sf(data = fire1, fill = NA, color = "#F6CF65", size = 2) +
+  geom_sf(data = fire2, fill = NA, color = "#D5D8DB", size = 2) +
+  geom_sf(data = fire3, fill = NA, color = "#FFF2AF", size = 2) +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
+```
+
+```{r}
+ggplot() +
   geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
     geom_sf(data = parks, fill = "#C3ECB2", color = "#C3ECB2") +
     geom_sf(data = lakes, fill = "#AADAFF", color = "#AADAFF") +
@@ -160,7 +187,7 @@ ggplot() +
   geom_sf(data = fire3, fill = NA, color = "#FFF2AF", size = 2) +
   coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
 ```
-
+xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2),
 ```{r}
 map_fires = ggplot() +
   geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
@@ -169,17 +196,21 @@ map_fires = ggplot() +
   geom_sf(data = fire1, fill = NA, color = "#b82b2b", size = 1) +
   geom_sf(data = fire2, fill = NA, color = "#b06f0c", size = 1) +
   geom_sf(data = fire3, fill = NA, color = "#dd7116", size = 1) +
-  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
+      annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0))
 
 map_fires
 ```
 
 
-```{r}
+```{r fig.height=7, fig.width=13}
 map_inset = 
   ggdraw() +
    draw_plot(map_fires) +
-  draw_plot(map_bc, x = 0.15, y = 0.14, width = .25, height = .25)
+  draw_plot(map_bc, x = 0.05, y = 0.05, width = .25, height = .25)
 
 map_inset
 
