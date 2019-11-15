@@ -114,7 +114,7 @@ ggplot() +
 
 ```{r}
 ggplot() + 
-  geom_sf(data = bc, fill = NA, color = "black") +
+  geom_sf(data = bc, fill = "gray75", color = "black") +
   geom_point(data = city, aes(x = lon, y= lat), shape = 24, size = 2, color = "red", fill = "red") +
   geom_label_repel(data = city, aes(x = lon, y= lat, label = c("Prince George", "Vancouver")), vjust = "top", hjust = "left", color = "black") +
   geom_point(data = fire1, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#714C02", fill = "#9D6C06", position=position_jitter(h=50, w=50)) +
@@ -127,13 +127,13 @@ ggplot() +
 
 ```{r}
 ggplot() + 
-  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
+  geom_sf(data = bc, fill = "gray75", color = "black") +
   geom_point(data = fire1, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#714C02", fill = "#9D6C06", position=position_jitter(h=50, w=50)) +
   geom_point(data = fire2, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#024E37", fill = "#026D4E", position=position_jitter(h=-10, w=-10)) +
   geom_point(data = fire3, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 2, color = "#01587A", fill = "#077DAA") +
   xlab("")+ylab("")+
   coord_sf() +
-   theme_void() +
+   
   # add a bounding box so that will border the inset
   theme(panel.background = element_rect(colour = "black", 
                                         size = 0.5))
@@ -149,6 +149,22 @@ map_bc = ggplot() +
   xlab("")+ylab("")+
   coord_sf() +
    theme_void() +
+  # add a bounding box so that will border the inset
+  theme(panel.background = element_rect(colour = "black", fill = "white", size = 0.5))
+
+
+map_bc
+```
+
+```{r}
+map_bc = ggplot() + 
+  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
+  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=50, w=50)) +
+  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=-10, w=-10)) +
+  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, size = 2, color = "#b82b2b", fill = "#b82b2b") +
+  xlab("")+ylab("")+
+  coord_sf() +
+   theme_light() +
   # add a bounding box so that will border the inset
   theme(panel.background = element_rect(colour = "black", 
                                         size = 0.5))
@@ -200,22 +216,27 @@ map_fires = ggplot() +
       annotation_scale(location = "br", width_hint = 0.25) +
     annotation_north_arrow(location = "br", which_north = "true", 
         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
-        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0))
+        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
+  theme(axis.text.x = element_text(face = "plain", color = "black", size = 12),
+        axis.text.y = element_text(face = "plain", color = "black", size = 12))
 
 map_fires
 ```
 
 
-```{r fig.height=7, fig.width=13}
+```{r fig.height=8, fig.width=14}
 map_inset = 
   ggdraw() +
    draw_plot(map_fires) +
-  draw_plot(map_bc, x = 0.05, y = 0.05, width = .25, height = .25)
+  draw_plot(map_bc, x = 0.05, y = 0.1, width = .25, height = .25)
 
 map_inset
 
 ```
 
+```{r}
+ggsave("../figures/bc_map.png", width = 14, height = 8, dpi = 600)
+```
 
 ```{r}
 ggplot() +
