@@ -255,7 +255,7 @@ map_fires
 
 ```{r}
 plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-legend("topleft", legend =c('Provincial Parks', 'Lakes', ' Chelaslie (2014)', 'Tweedsmuir (2013)',
+legend("topleft", legend =c('Provincial parks', 'Lakes', ' Chelaslie (2014)', 'Tweedsmuir (2013)',
     'Entiako (2012)'), pch=16, pt.cex=3, cex=1.5, bty='n',
     col = c("#C3ECB2", "#AADAFF", "#b82b2b", "#b06f0c", "#dd7116"))
 mtext("", at=0.2, cex=2)
