@@ -68,6 +68,13 @@ all_fires= st_read("../shapefiles/perimeter_merge.shp")
 ```
 
 ```{r}
+
+(insetrect <- data.frame(xmin = 985362, xmax = 1069051,
+    ymin = 894097.7, ymax = 939814.2))
+```
+
+
+```{r}
 str(all_fires)
 ```
 
@@ -156,6 +163,22 @@ map_bc = ggplot() +
 
 map_bc
 ```
+
+
+```{r}
+map_bc2 = ggplot() + 
+  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
+  geom_rect(data = insetrect, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), alpha = 0, colour = "#000080", size = 1.5, linetype = 1) +
+  xlab("")+ylab("")+
+  coord_sf() +
+   theme_void() +
+  # add a bounding box so that will border the inset
+  theme(panel.background = element_rect(colour = "black", fill = "white", size = 0.5))
+
+
+map_bc2
+```
+
 
 ```{r}
 ggplot() + 
@@ -306,12 +329,16 @@ fig_manuscript1
 
 fig_manuscript2 = ggdraw() +
    draw_plot(map_legend2) +
-  draw_plot(map_bc, x = 0.12, y = 0.32, width = .25, height = .25) 
+  draw_plot(map_bc2, x = 0.12, y = 0.32, width = .25, height = .25) 
  
 
 fig_manuscript2
 
 
+```
+
+```{r}
+ggsave("../figures/bc_map_manuscript.png", plot = fig_manuscript2, width = 6, height = 4, dpi = 600)
 ```
 
 ## Poster
