@@ -233,6 +233,88 @@ ggplot() +
   coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
 ```
 xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2),
+
+## Manuscript
+
+```{r}
+map_legend = ggplot() +
+  geom_sf(data = bc, aes(fill = "BC", color = "BC")) +
+    geom_sf(data = parks, aes(fill = "Parks", color = "Parks"), show.legend = TRUE) +
+    geom_sf(data = lakes, aes(fill = "Lakes", color = "Lakes"), show.legend = TRUE, key_glyph = draw_key_rect) +
+  geom_sf(data = fire1, fill = NA, aes(color = "Fire1"), size = 1, show.legend = TRUE, key_glyph = draw_key_rect) +
+  geom_sf(data = fire2, fill = NA, aes(color = "Fire2"), size = 1, show.legend = TRUE) +
+  geom_sf(data = fire3, fill = NA, aes(color = "Fire3"), size = 1, show.legend = TRUE) +
+  scale_color_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = "#b82b2b", "Fire2" = "#b06f0c", "Fire3" =  "#dd7116"), 
+                       labels = c("British Columbia", "Chelaslie fire", "Entiako fire", "Tweedsmuir fire", "Lakes", "Provincial parks"),
+                       name = "Legend") +
+  scale_fill_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = NA, "Fire2" = NA, "Fire3" =  NA),
+                    guide=FALSE) +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
+      annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") +
+    annotation_north_arrow(location = "tl", which_north = "true", 
+        pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
+  theme(axis.text.x = element_text(face = "plain", color = "black", size = 12),
+        axis.text.y = element_text(face = "plain", color = "black", size = 12),
+        legend.position= c(0.88, 0.35),
+        legend.key = element_rect(fill = "white")) 
+
+
+map_legend
+```
+
+```{r}
+map_legend2 = ggplot() +
+  geom_sf(data = bc, aes(fill = "BC", color = "BC")) +
+    geom_sf(data = parks, aes(fill = "Parks", color = "Parks"), show.legend = TRUE) +
+    geom_sf(data = lakes, aes(fill = "Lakes", color = "Lakes"), show.legend = TRUE, key_glyph = draw_key_rect) +
+  geom_sf(data = fire1, fill = NA, aes(color = "Fire1"), size = 1, show.legend = TRUE, key_glyph = draw_key_rect) +
+  geom_sf(data = fire2, fill = NA, aes(color = "Fire2"), size = 1, show.legend = TRUE) +
+  geom_sf(data = fire3, fill = NA, aes(color = "Fire3"), size = 1, show.legend = TRUE) +
+  scale_color_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = "#b82b2b", "Fire2" = "#b06f0c", "Fire3" =  "#dd7116"), 
+                       labels = c("British Columbia", "Chelaslie fire", "Entiako fire", "Tweedsmuir fire", "Lakes", "Provincial parks"),
+                       name = "") +
+  scale_fill_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = NA, "Fire2" = NA, "Fire3" =  NA),
+                    guide=FALSE) +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
+      annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.4, "in"), pad_y = unit(0.5, "in"),
+        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
+  theme(axis.text.x = element_text(face = "plain", color = "black", size = 10),
+        axis.text.y = element_text(face = "plain", color = "black", size = 10),
+        legend.position= "bottom",
+        legend.key = element_rect(fill = "white")) 
+
+
+map_legend2
+```
+
+```{r fig.height=4, fig.width=6}
+
+fig_manuscript1 = ggdraw() +
+   draw_plot(map_legend) +
+  draw_plot(map_bc, x = 0.1, y = 0.2, width = .25, height = .25) 
+ 
+
+fig_manuscript1
+
+
+```
+
+```{r fig.height=4, fig.width=6}
+
+fig_manuscript2 = ggdraw() +
+   draw_plot(map_legend2) +
+  draw_plot(map_bc, x = 0.12, y = 0.32, width = .25, height = .25) 
+ 
+
+fig_manuscript2
+
+
+```
+
+## Poster
 ```{r}
 map_fires = ggplot() +
   geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
@@ -253,16 +335,9 @@ map_fires = ggplot() +
 map_fires
 ```
 
-```{r}
-plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-legend("topleft", legend =c('Provincial parks', 'Lakes', ' Chelaslie (2014)', 'Tweedsmuir (2013)',
-    'Entiako (2012)'), pch=16, pt.cex=3, cex=1.5, bty='n',
-    col = c("#C3ECB2", "#AADAFF", "#b82b2b", "#b06f0c", "#dd7116"))
-mtext("", at=0.2, cex=2)
-```
 
 
-cfgrid21 = plot_grid(cfgrid20, legend, ncol=1, rel_widths = c(1, .1), rel_heights = c(1, .05)) 
+
 
 ```{r fig.height=9, fig.width=15}
 
@@ -279,7 +354,7 @@ map_bc_legend
 
 ```
 
-
+## Poster
 ```{r fig.height=9, fig.width=15}
 
 map_bc_labels = ggdraw() +
@@ -298,6 +373,67 @@ map_bc_labels
 ggsave("../figures/bc_map_labels.png", plot = map_bc_labels, width = 15, height = 9, dpi = 600)
 ```
 
+
+## Manuscript
+margin(t = 0, r = 0, b = 0, l = 0, unit = "pt")
+
+
+
+```{r fig.height=4, fig.width=6}
+map_fires_manuscript = ggplot() +
+  geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
+    geom_sf(data = parks, fill = "#C3ECB2", color = "#C3ECB2") +
+    geom_sf(data = lakes, fill = "#AADAFF", color = "#AADAFF") +
+  geom_sf(data = fire1, fill = NA, color = "#b82b2b", size = 1) +
+  geom_sf(data = fire2, fill = NA, color = "#b06f0c", size = 1) +
+  geom_sf(data = fire3, fill = NA, color = "#dd7116", size = 1) +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
+      annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.25, "in"), pad_y = unit(0.5, "in"),
+        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
+  theme(
+    plot.margin = margin(t=0, r=.2, b=0, l=.2, "cm"),
+    axis.text.x = element_text(face = "plain", color = "black", size = 11),
+        axis.text.y = element_text(face = "plain", color = "black", size = 11)) 
+
+
+map_fires_manuscript
+```
+
+
+```{r fig.height=4, fig.width=6}
+
+map_bc_labels_manuscript = ggdraw() +
+   draw_plot(map_fires_manuscript) +
+  draw_plot(map_bc, x = 0.1, y = 0.2, width = .25, height = .25) +
+  draw_label("Chelaslie\n(2014)", x = .4, y = .76, fontface = "plain", color = "black", size = 10) +
+  draw_label("Chelaslie\n(2014)", x = .5, y = .55, fontface = "plain", color = "black", size = 10) +
+  draw_label("Entiako\n(2012)", x = .58, y = .415, fontface = "plain", color = "black", size = 10, angle = 30) +
+  draw_label("Tweedsmuir\n(2013)", x = .18, y = .6, fontface = "plain", color = "black", size = 10, angle = 30) 
+
+map_bc_labels_manuscript
+
+
+```
+
+```{r}
+ggsave("../figures/bc_map_labels_manuscript.png", plot = map_bc_labels_manuscript, width = 6, height = 4, dpi = 600)
+```
+
+```{r fig.height=4, fig.width=6}
+
+fig_manuscript = ggdraw() +
+   draw_plot(map_legend) +
+  draw_plot(map_bc, x = 0.1, y = 0.2, width = .25, height = .25) 
+ 
+
+fig_manuscript
+
+
+```
+
+## Other
 ```{r fig.height=8, fig.width=14}
 map_inset = 
   ggdraw() +
