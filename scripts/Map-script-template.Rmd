@@ -1,0 +1,218 @@
+---
+title: "Map Making in R: An Example"
+author: "Anna Talucci"
+date: "04/02/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+A working example of assembling a map with `ggplot()` and `cowplot()`.  The use of `ggplot()` for mapping is dependent on the use of `sf` objects
+
+- This script is reliant on relative path names "../folder-name/file-name.ext"
+- Please reference the Git Hub repository called **BC-Maps** to see the file  structure  used here
+
+# Packages
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(DT)
+library(sf)
+library(ggmap) # devtools::install_github("dkahle/ggmap")
+library(ggrepel)
+library(raster)
+library(rgdal)
+library(rasterVis)
+library(RColorBrewer)
+library(cowplot)
+library(ggspatial)
+library(maps)
+```
+
+# Read in shapefile boundaries
+
+We are using relative file path names here. Note the file name is preceded by the sub-folder shapefiles in the data folder.
+
+```{r}
+fire1 <- st_read(
+  "../shapefiles/ch_R10070_2014.shp")
+```
+
+```{r}
+fire2 <- st_read(
+  "../shapefiles/en_R10171_2012.shp")
+```
+
+```{r}
+fire3 <- st_read(
+  "../shapefiles/tw_R10252_2013.shp")
+```
+
+```{r}
+all_fires= st_read("../shapefiles/perimeter_merge.shp")
+```
+
+```{r}
+bc = st_read("../shapefiles/province_bc_alber.shp")
+```
+
+```{r}
+lakes = st_read("../shapefiles/Lakes_select_fire.shp")
+```
+
+```{r}
+parks = st_read("../shapefiles/tweed-entiako_singlepoly.shp")
+```
+
+```{r}
+city = st_read("../shapefiles/BC_Vancouver_PrinceGeorge.shp")
+```
+
+# Create a bounding box 
+
+Use metadata from all_fires shapefile to identify `xmin`, `xmax`, `ymin`, and `ymax` to define the bounding box
+
+```{r}
+(insetrect <- data.frame(xmin = 985362, xmax = 1069051, ymin = 894097.7, ymax = 939814.2))
+```
+
+# Map Making
+
+Code annotations are preceded by `#` and precede the line of code they describe.
+
+## Insert city location with name label
+
+Use `str()` on the city shapfile to look at the data frame for the point file to identify data frame components to use in `ggplot()` e.g. lat, lon for coordinates  and NAME for city name label.
+
+```{r}
+ggplot() + 
+  #add BC Boundary
+  geom_sf(data = bc, fill = "gray75", color = "black") + 
+  #add city point data
+  geom_point(data = city, aes(x = lon, y= lat), shape = 24, size = 2, color = "red", fill = "red") + 
+  #add Label city name
+  geom_label_repel(data = city, aes(x = lon, y= lat, label = c("Prince George", "Vancouver")), vjust = "top", hjust = "left", color = "black") + 
+  xlab("")+ylab("") +
+  coord_sf()
+```
+
+## British Columbia with study area bounding box
+
+This map will serve as an inset in the final map.
+
+```{r}
+map_bc2 = ggplot() + 
+  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
+  #Use bounding box from above
+  geom_rect(data = insetrect, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), alpha = 0, colour = "#000080", size = 1.5, linetype = 1) +
+  xlab("")+ylab("")+
+  coord_sf() +
+   theme_void() +
+  #add a bounding box so that will border the inset
+  theme(panel.background = element_rect(colour = "black", fill = "white", size = 0.5))
+
+map_bc2
+```
+
+## Map with legend bottom
+
+Here e create a map with a legend box that is placed outside of the map along the bottom.
+
+```{r}
+map_legend2 = ggplot() +
+  #add shapefile
+  geom_sf(data = bc, aes(fill = "BC", color = "BC")) + 
+  #add shapefile
+  geom_sf(data = parks, aes(fill = "Parks", color = "Parks"), show.legend = TRUE) + 
+  #add shapefile
+  geom_sf(data = lakes, aes(fill = "Lakes", color = "Lakes"), show.legend = TRUE, key_glyph = draw_key_rect) + 
+  #add shapefile
+  geom_sf(data = fire1, fill = NA, aes(color = "Fire1"), size = 1, show.legend = TRUE, key_glyph = draw_key_rect) + 
+  #add shapefile
+  geom_sf(data = fire2, fill = NA, aes(color = "Fire2"), size = 1, show.legend = TRUE)  +
+  #add shapefile
+  geom_sf(data = fire3, fill = NA, aes(color = "Fire3"), size = 1, show.legend = TRUE) + 
+  #manually define colors with hexcodes 
+  scale_color_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = "#b82b2b", "Fire2" = "#b06f0c", "Fire3" =  "#dd7116"), 
+                       labels = c("British Columbia", "Chelaslie fire", "Entiako fire", "Tweedsmuir fire", "Lakes", "Provincial parks"),
+                       name = "") + 
+  #manual define fill; for no fill NA
+  scale_fill_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = NA, "Fire2" = NA, "Fire3" =  NA), guide=FALSE) + 
+  #define coordinates based on shapefile metadata
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
+  #add a scale bar
+  annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") + 
+  #add North Arrow
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.4, "in"), pad_y = unit(0.5, "in"),
+        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) + 
+  #define theme
+  theme(axis.text.x = element_text(face = "plain", color = "black", size = 10),
+        axis.text.y = element_text(face = "plain", color = "black", size = 10),
+        legend.position= "bottom",
+        legend.key = element_rect(fill = "white")) 
+
+map_legend2
+```
+
+## Alternative legend location
+
+Here we create a map with a legend box that is placed in the low right corner of the map.
+
+```{r}
+map_legend = ggplot() +
+  geom_sf(data = bc, aes(fill = "BC", color = "BC")) +
+    geom_sf(data = parks, aes(fill = "Parks", color = "Parks"), show.legend = TRUE) +
+    geom_sf(data = lakes, aes(fill = "Lakes", color = "Lakes"), show.legend = TRUE, key_glyph = draw_key_rect) +
+  geom_sf(data = fire1, fill = NA, aes(color = "Fire1"), size = 1, show.legend = TRUE, key_glyph = draw_key_rect) +
+  geom_sf(data = fire2, fill = NA, aes(color = "Fire2"), size = 1, show.legend = TRUE) +
+  geom_sf(data = fire3, fill = NA, aes(color = "Fire3"), size = 1, show.legend = TRUE) +
+  scale_color_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = "#b82b2b", "Fire2" = "#b06f0c", "Fire3" =  "#dd7116"), 
+                       labels = c("British Columbia", "Chelaslie fire", "Entiako fire", "Tweedsmuir fire", "Lakes", "Provincial parks"),
+                       name = "Legend") +
+  scale_fill_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = NA, "Fire2" = NA, "Fire3" =  NA),
+                    guide=FALSE) +
+  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
+      annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") +
+    annotation_north_arrow(location = "tl", which_north = "true", 
+        pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
+  theme(axis.text.x = element_text(face = "plain", color = "black", size = 12),
+        axis.text.y = element_text(face = "plain", color = "black", size = 12),
+        legend.position= c(0.88, 0.35),
+        legend.key = element_rect(fill = "white")) 
+
+map_legend
+```
+
+
+# Combining Maps
+
+We combine our study area map with the inset map for a final map figure
+
+
+```{r fig.height=4, fig.width=6}
+fig_manuscript2 = ggdraw() +
+  #add base map
+  draw_plot(map_legend2) +
+  #add inset and define size and location 
+  draw_plot(map_bc2, x = 0.12, y = 0.32, width = .25, height = .25) 
+ 
+fig_manuscript2
+```
+
+# Save map as file
+
+Use `ggsave()` to export the map to a file. Note the relative path name. Multiple extensions are available. Width and height are defined for this figure, but should be adjusted for future figures.
+
+```{r}
+ggsave("../figures/bc_map_manuscript.png", plot = fig_manuscript2, width = 6, height = 4, dpi = 600)
+```
+
+
