@@ -108,63 +108,11 @@ labs <- tibble(
 ```{r}
 linecolors <- c("#714C02", "#01587A", "#024E37")
 fillcolors <- c("#9D6C06", "#077DAA", "#026D4E")
-
-ggplot() + 
-  geom_sf(data = bc, fill = NA, color = "black") +
-  geom_point(data = all_fires, aes(x = lon, y= lat), position=position_jitter(h=0.1, w=0.1),
-             shape = 21, alpha = 0.5, size = 10) +
-    scale_color_manual(values=linecolors) +
-  scale_fill_manual(values=fillcolors) +
-
-  ggtitle("Fire perimeters for study area") + 
-  coord_sf()
 ```
 
-```{r}
-ggplot() + 
-  geom_sf(data = bc, fill = "gray75", color = "black") +
-  geom_point(data = city, aes(x = lon, y= lat), shape = 24, size = 2, color = "red", fill = "red") +
-  geom_label_repel(data = city, aes(x = lon, y= lat, label = c("Prince George", "Vancouver")), vjust = "top", hjust = "left", color = "black") +
-  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#714C02", fill = "#9D6C06", position=position_jitter(h=50, w=50)) +
-  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#024E37", fill = "#026D4E", position=position_jitter(h=-10, w=-10)) +
-  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 2, color = "#01587A", fill = "#077DAA") +
-  xlab("")+ylab("")+
-  coord_sf()
-```
+# Manuscript Figure
 
-
-```{r}
-ggplot() + 
-  geom_sf(data = bc, fill = "gray75", color = "black") +
-  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#714C02", fill = "#9D6C06", position=position_jitter(h=50, w=50)) +
-  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 3, color = "#024E37", fill = "#026D4E", position=position_jitter(h=-10, w=-10)) +
-  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, alpha = 0.5, size = 2, color = "#01587A", fill = "#077DAA") +
-  xlab("")+ylab("")+
-  coord_sf() +
-   
-  # add a bounding box so that will border the inset
-  theme(panel.background = element_rect(colour = "black", 
-                                        size = 0.5))
-
-
-```
-```{r}
-map_bc = ggplot() + 
-  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
-  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=50, w=50)) +
-  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=-10, w=-10)) +
-  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, size = 2, color = "#b82b2b", fill = "#b82b2b") +
-  xlab("")+ylab("")+
-  coord_sf() +
-   theme_void() +
-  # add a bounding box so that will border the inset
-  theme(panel.background = element_rect(colour = "black", fill = "white", size = 0.5))
-
-
-map_bc
-```
-
-
+## BC Map for inset
 ```{r}
 map_bc2 = ggplot() + 
   geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
@@ -180,84 +128,7 @@ map_bc2
 ```
 
 
-```{r}
-ggplot() + 
-  geom_sf(data = bc, fill = "#E8E8E8", color = "black", legend.outside = TRUE) 
-```
-
-
-```{r}
-ggplot() + 
-  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
-  geom_sf(data = fire1, fill = NA, color = "#b82b2b", size = 1, show.legend = "line") +
-  geom_sf(data = fire2, fill = NA, color = "#b06f0c", size = 1) +
-  geom_sf(data = fire3, fill = NA, color = "#dd7116", size = 1) +
-  xlab("")+ylab("")+
-  coord_sf() +
-  scale_colour_manual(values = c("#b82b2b", "#b06f0c", "#dd7116"),
-                      guide = guide_legend(override.aes = list(linetype = c("blank", "solid")))) +
-
-  # add a bounding box so that will border the inset
-  theme(panel.background = element_rect(colour = "black", fill = "white", size = 0.5)) 
-
-
-
-```
-
-
-```{r}
- ggplot() + 
-  geom_sf(data = bc, fill = "#E8E8E8", color = "black") +
-  geom_point(data = fire1, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=50, w=50)) +
-  geom_point(data = fire2, aes(x = lon, y= lat), shape =21, size = 3, color = "#b82b2b", fill = "#b82b2b", position=position_jitter(h=-10, w=-10)) +
-  geom_point(data = fire3, aes(x = lon, y= lat), shape =21, size = 2, color = "#b82b2b", fill = "#b82b2b") +
-  xlab("")+ylab("")+
-  coord_sf() +
-   theme_light() +
-  # add a bounding box so that will border the inset
-  theme(panel.background = element_rect(colour = "black", 
-                                        size = 0.5))
-
-```
- xmin: 985362 ymin: 894097.7 xmax: 1069051 ymax: 939814.2
-  xmin: 999314.8 ymin: 894097.7 xmax: 1069051 ymax: 939814.2
-```{r}
-ggplot() +
-  geom_sf(data = bc, fill = "#cfcfc4", color = "#cfcfc4") +
-    geom_sf(data = parks, fill = "#56887d", color = "#56887d") +
-    geom_sf(data = lakes, fill = "#56a0d3", color = "#56a0d3") +
-  geom_sf(data = fire1, fill = NA, color = "brown") +
-  geom_sf(data = fire2, fill = NA, color = "yellow") +
-  geom_sf(data = fire3, fill = NA, color = "black") +
-  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
-```
-
-```{r}
-ggplot() +
-  annotation_map_tile(type = "osm") +
-  geom_sf(data = fire1, fill = NA, color = "#F6CF65", size = 2) +
-  geom_sf(data = fire2, fill = NA, color = "#D5D8DB", size = 2) +
-  geom_sf(data = fire3, fill = NA, color = "#FFF2AF", size = 2) +
-  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
-```
-
-```{r}
-ggplot() +
-  geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
-    geom_sf(data = parks, fill = "#C3ECB2", color = "#C3ECB2") +
-    geom_sf(data = lakes, fill = "#AADAFF", color = "#AADAFF") +
-  geom_sf(data = fire1, fill = NA, color = "#F6CF65", size = 2) +
-  geom_sf(data = fire2, fill = NA, color = "#D5D8DB", size = 2) +
-  geom_sf(data = fire3, fill = NA, color = "#FFF2AF", size = 2) +
-  scale_color_identity(name = "Map",
-                          breaks = c("#E8E8E8", "#C3ECB2", "#AADAFF", "#F6CF65", "#D5D8DB", "#FFF2AF"),
-                          labels = c("BC", "Parks", "lakes", "Fire1", "Fire2", "Fire3"),
-                          guide = "legend") +
-  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2), expand = FALSE) 
-```
-xlim = c(985362, 1069051), ylim = c(894097.7, 939814.2),
-
-## Manuscript
+## Fire perimeter Map
 
 ```{r}
 map_legend = ggplot() +
@@ -335,7 +206,7 @@ fig_manuscript2
 ```
 
 ```{r}
-ggsave("../figures/bc_map_manuscript.png", plot = fig_manuscript2, width = 6, height = 4, dpi = 600)
+ggsave("../figures/2021-01-19_bc_map_manuscript.png", plot = fig_manuscript2, width = 6, height = 4, dpi = 600)
 ```
 
 ## Poster
