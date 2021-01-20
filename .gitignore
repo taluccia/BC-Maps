@@ -34,3 +34,12 @@ vignettes/*.pdf
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
+
+# exclude specific folders from push to github
+figures/*
+files/*
+data/*
+figs/*
+output/*
+shapefiles/*
+NE1/*
