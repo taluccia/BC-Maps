@@ -295,7 +295,7 @@ sat_map
 ```
 
 ## Combine with inset map
-```{r fig.height=5, fig.width=6}
+```{r fig.height=4, fig.width=6}
 
 fig_man3 = ggdraw() +
    draw_plot(sat_map) +
@@ -308,7 +308,7 @@ fig_man3
 ```
 
 ```{r}
-ggsave("../figures/2021-05-13_bc_map_manuscript.png", plot = fig_man3, width = 6, height = 5, dpi = 600)
+ggsave("../figures/2021-05-13_bc_map_manuscript.png", plot = fig_man3, width = 6, height = 4, dpi = 600)
 ```
 
 # Poster
