@@ -23,7 +23,7 @@ library(DT)
 library(sf)
 library(ggmap) # devtools::install_github("dkahle/ggmap")
 library(ggrepel)
-
+library(RStoolbox)
 library(raster)
 library(rgdal)
 library(rasterVis)
@@ -31,43 +31,43 @@ library(RColorBrewer)
 library(cowplot)
 library(ggspatial)
 library(maps)
+library(maptools)
+library(rgeos)
+library(sp)
+library(mapproj)
 ```
 
+# Projection
+[BC Albers Equal Area projection](https://georepository.com/crs_3005/NAD83-BC-Albers.html)
 
+https://epsg.io/3005 or https://spatialreference.org/ref/epsg/3005/
+
+```{r}
+ea_bc = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+```
+
+# Data
+
+## Raster
 ```{r}
 bc_stack <- stack("../data/raster/BC-Landsat-Image.tif")
 ```
 
-
-
 ```{r}
-fire1 <- st_read(
-  "../shapefiles/ch_R10070_2014.shp")
+extent(bc_stack)
+```
+
+## Shapefiles
+```{r}
+tw_perm = st_read("../data/Fire-Perimeters-Original/tw_R10252_2013.shp", "tw_R10252_2013") 
 ```
 
 ```{r}
-fire2 <- st_read(
-  "../shapefiles/en_R10171_2012.shp")
+ch_perm = st_read("../data/Fire-Perimeters-Original/ch_R10070_2014.shp", "ch_R10070_2014") 
 ```
 
 ```{r}
-fire3 <- st_read(
-  "../shapefiles/tw_R10252_2013.shp")
-```
-
-```{r}
-all_fires= st_read("../shapefiles/perimeter_merge.shp")
-```
-
-```{r}
-
-(insetrect <- data.frame(xmin = 985362, xmax = 1069051,
-    ymin = 894097.7, ymax = 939814.2))
-```
-
-
-```{r}
-str(all_fires)
+en_perm = st_read("../data/Fire-Perimeters-Original/en_R10171_2012.shp", "en_R10171_2012") 
 ```
 
 ```{r}
@@ -85,10 +85,59 @@ parks = st_read("../shapefiles/tweed-entiako_singlepoly.shp")
 ```{r}
 city = st_read("../shapefiles/BC_Vancouver_PrinceGeorge.shp")
 ```
+# Reproject in Equal area
 
 ```{r}
-str(city)
+img_ea <- projectRaster(bc_stack, crs = ea_bc)
+
 ```
+
+```{r}
+extent(img_ea)
+```
+```{r}
+tw_ea = st_transform(tw_perm, crs=ea_bc)
+ch_ea = st_transform(ch_perm, crs=ea_bc)
+en_ea = st_transform(en_perm, crs=ea_bc)
+```
+
+```{r}
+bc_ea = st_transform(bc, crs=ea_bc)
+lakes_ea = st_transform(lakes, crs=ea_bc)
+parks_ea = st_transform(parks, crs=ea_bc)
+city_ea = st_transform(city, crs=ea_bc)
+```
+
+# Unused code (DELETE)
+```{r eval=FALSE, include=FALSE}
+fire1 <- st_read(
+  "../shapefiles/ch_R10070_2014.shp")
+```
+
+```{r eval=FALSE, include=FALSE}
+fire2 <- st_read(
+  "../shapefiles/en_R10171_2012.shp")
+```
+
+```{r eval=FALSE, include=FALSE}
+fire3 <- st_read(
+  "../shapefiles/tw_R10252_2013.shp")
+```
+
+```{r eval=FALSE, include=FALSE}
+all_fires= st_read("../shapefiles/perimeter_merge.shp")
+```
+
+
+# Bounding Box
+```{r}
+
+(insetrect <- data.frame(xmin = 985362, xmax = 1069051,
+    ymin = 894097.7, ymax = 939814.2))
+```
+
+
+
 
 ```{r}
 labs <- tibble(
@@ -101,6 +150,9 @@ labs <- tibble(
 linecolors <- c("#714C02", "#01587A", "#024E37")
 fillcolors <- c("#9D6C06", "#077DAA", "#026D4E")
 ```
+
+
+
 
 # Manuscript Figure
 
@@ -201,7 +253,65 @@ fig_manuscript2
 ggsave("../figures/2021-01-19_bc_map_manuscript.png", plot = fig_manuscript2, width = 6, height = 4, dpi = 600)
 ```
 
-## Poster
+
+
+
+# Map  with satelliite image
+class      : Extent 
+xmin       : 976470 
+xmax       : 1081530 
+ymin       : 880380 
+ymax       : 951870 
+
+```{r fig.height=5, fig.width=6}
+sat_map =  ggplot() + 
+  ggRGB(img_ea, r=1, g=2, b=3, ggLayer = TRUE, coord_equal = TRUE) +
+
+  geom_sf(data = ch_ea, fill = NA, aes(color = "Fire1"), size = 1, show.legend = TRUE, key_glyph = draw_key_rect) +
+  geom_sf(data = en_ea, fill = NA, aes(color = "Fire2"), size = 1, show.legend = TRUE) +
+  geom_sf(data = tw_ea, fill = NA, aes(color = "Fire3"), size = 1, show.legend = TRUE) +
+  
+  scale_color_manual(values = c("Fire1" = "#fee08b", "Fire2" = "#ff6347", "Fire3" ="#fdae61" ), labels = c( "Chelaslie fire", "Entiako fire", "Tweedsmuir fire"), name = "") +
+  scale_fill_manual(values = c("BC" = "#7E7E7E", "Parks" = "#75816B", "Lakes" = "#AADAFF", "Fire1" = NA, "Fire2" = NA, "Fire3" =  NA),
+                    guide=FALSE) +
+  
+      annotation_north_arrow(location = "br", which_north = "true", pad_x = unit(0.0, "cm"), pad_y = unit(0.7, "cm"), style = north_arrow_minimal(line_width = 1, line_col = "white", fill = "white", text_size = 0, text_face = NULL, text_family = "sans", text_col = "white")) +
+  
+  
+  annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = "bold", text_family = "sans", text_col = "white") +
+  
+   theme_classic() +
+  
+  theme(plot.margin = unit(c(t = 0.2, r = 0.2, b = 0.2, l = 0.2), "cm")) +
+    theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "white")) +
+  theme(legend.position = "bottom")
+
+
+sat_map
+
+```
+
+## Combine with inset map
+```{r fig.height=5, fig.width=6}
+
+fig_man3 = ggdraw() +
+   draw_plot(sat_map) +
+  draw_plot(map_bc2, x = 0.12, y = 0.32, width = .2, height = .2) 
+ 
+
+fig_man3
+
+
+```
+
+```{r}
+ggsave("../figures/2021-05-13_bc_map_manuscript.png", plot = fig_man3, width = 6, height = 5, dpi = 600)
+```
+
+# Poster
 ```{r}
 map_fires = ggplot() +
   geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
@@ -221,45 +331,3 @@ map_fires = ggplot() +
 
 map_fires
 ```
-
-
-# Map  with satelliite image
-
-```{r}
-plot_transects5 = ggplot() + 
-  ggRGB(kr_stack, r=1, g=2, b=3, ggLayer = TRUE, coord_equal = TRUE) +
-  geom_sf(data = cherskiy, size = 4, shape = 24, fill = "grey70") +
-     annotate(geom = "text", x = 161.76, y = 68.69, label = "Cherskiy", 
-    fontface = "bold", color = "grey70", size = 4) +
-  geom_sf(data = plot100_pt_sf, aes(fill = site, color = site),size = 4, shape = 21, alpha= .9) +
-  scale_color_manual(values=linecolors) +
-  scale_fill_manual(values=fillcolors) +
-  scale_y_continuous(breaks = seq(67.5, 69, by = .5), name = "") +
-  scale_x_continuous(breaks = seq(161, 162), name = "") +
-  
-   annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.0, "cm"), pad_y = unit(0.7, "cm"), style = north_arrow_minimal(line_width = 1, line_col = "white", fill = "white", text_size = 0, text_face = NULL, text_family = "sans", text_col = "white")) +
-  
-  
-  annotation_scale(location = "bl", width_hint = 0.25, text_size = 12, text_face = "bold", text_family = "sans", text_col = "white") +
-  
-  coord_sf(crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0", xlim = c(160.4, 162.4), ylim = c(67.8, 68.8), expand = TRUE) +
-  
-  theme_classic()+
-  
-  theme(plot.margin = unit(c(t = 0.2, r = 0.2, b = 0.2, l = 0.2), "cm")) +
-    theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        panel.background = element_blank(), 
-        axis.line = element_line(colour = "white")) +
-  theme(legend.position = "none")
-  
-
-
-plot_transects5
-
-```
-
-
-
