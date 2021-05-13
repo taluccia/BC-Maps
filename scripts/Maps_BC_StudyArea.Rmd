@@ -14,14 +14,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 # Packages
-```{r}
-  library(leaflet)
-  library(dplyr)
-  library(tidyr)
-  library(ggplot2)
-  library(DT)
-  library(sf)
-  library(ggmap) # devtools::install_github("dkahle/ggmap")
+```{r message=FALSE, warning=FALSE}
+library(leaflet)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(DT)
+library(sf)
+library(ggmap) # devtools::install_github("dkahle/ggmap")
 library(ggrepel)
 
 library(raster)
@@ -35,15 +35,7 @@ library(maps)
 
 
 ```{r}
-ne1 <- 
-  raster("../NE1/NE1_HR_LC_SR_W_DR.tif")
-
-ne1
-```
-
-xmin: 273544 ymin: 369009.5 xmax: 1870570 ymax: 1735691
-```{r}
-plot(ne1)
+bc_stack <- stack("../data/raster/BC-Landsat-Image.tif")
 ```
 
 
@@ -230,6 +222,44 @@ map_fires = ggplot() +
 map_fires
 ```
 
+
+# Map  with satelliite image
+
+```{r}
+plot_transects5 = ggplot() + 
+  ggRGB(kr_stack, r=1, g=2, b=3, ggLayer = TRUE, coord_equal = TRUE) +
+  geom_sf(data = cherskiy, size = 4, shape = 24, fill = "grey70") +
+     annotate(geom = "text", x = 161.76, y = 68.69, label = "Cherskiy", 
+    fontface = "bold", color = "grey70", size = 4) +
+  geom_sf(data = plot100_pt_sf, aes(fill = site, color = site),size = 4, shape = 21, alpha= .9) +
+  scale_color_manual(values=linecolors) +
+  scale_fill_manual(values=fillcolors) +
+  scale_y_continuous(breaks = seq(67.5, 69, by = .5), name = "") +
+  scale_x_continuous(breaks = seq(161, 162), name = "") +
+  
+   annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.0, "cm"), pad_y = unit(0.7, "cm"), style = north_arrow_minimal(line_width = 1, line_col = "white", fill = "white", text_size = 0, text_face = NULL, text_family = "sans", text_col = "white")) +
+  
+  
+  annotation_scale(location = "bl", width_hint = 0.25, text_size = 12, text_face = "bold", text_family = "sans", text_col = "white") +
+  
+  coord_sf(crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0", xlim = c(160.4, 162.4), ylim = c(67.8, 68.8), expand = TRUE) +
+  
+  theme_classic()+
+  
+  theme(plot.margin = unit(c(t = 0.2, r = 0.2, b = 0.2, l = 0.2), "cm")) +
+    theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "white")) +
+  theme(legend.position = "none")
+  
+
+
+plot_transects5
+
+```
 
 
 
