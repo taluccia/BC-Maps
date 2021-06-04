@@ -287,7 +287,14 @@ sat_map =  ggplot() +
         axis.title.y = element_blank(),
         panel.background = element_blank(), 
         axis.line = element_line(colour = "white")) +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") +
+  theme(legend.title = element_blank(),       
+        legend.key.height = unit(.1, 'in'), 
+        legend.key.width = unit(.2, 'in'),
+        legend.background = element_rect(fill=alpha('white', 0.0)))  + 
+  guides(fill = guide_legend( ncol=1), 
+         shape = guide_legend(override.aes = list(size = 0.4)), 
+         color = guide_legend(override.aes = list(size = 0.4))) + theme(legend.text = element_text(size = 10))
 
 
 sat_map
@@ -308,7 +315,7 @@ fig_man3
 ```
 
 ```{r}
-ggsave("../figures/2021-05-13_bc_map_manuscript.png", plot = fig_man3, width = 6, height = 4, dpi = 600)
+ggsave("../figures/BCStudyArea.png", plot = fig_man3, width = 6, height = 4, dpi = 600)
 ```
 
 # Poster
