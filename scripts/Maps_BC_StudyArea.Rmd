@@ -108,25 +108,6 @@ parks_ea = st_transform(parks, crs=ea_bc)
 city_ea = st_transform(city, crs=ea_bc)
 ```
 
-# Unused code (DELETE)
-```{r eval=FALSE, include=FALSE}
-fire1 <- st_read(
-  "../shapefiles/ch_R10070_2014.shp")
-```
-
-```{r eval=FALSE, include=FALSE}
-fire2 <- st_read(
-  "../shapefiles/en_R10171_2012.shp")
-```
-
-```{r eval=FALSE, include=FALSE}
-fire3 <- st_read(
-  "../shapefiles/tw_R10252_2013.shp")
-```
-
-```{r eval=FALSE, include=FALSE}
-all_fires= st_read("../shapefiles/perimeter_merge.shp")
-```
 
 
 # Bounding Box
@@ -174,32 +155,6 @@ map_bc2
 
 ## Fire perimeter Map
 
-```{r}
-map_legend = ggplot() +
-  geom_sf(data = bc, aes(fill = "BC", color = "BC")) +
-    geom_sf(data = parks, aes(fill = "Parks", color = "Parks"), show.legend = TRUE) +
-    geom_sf(data = lakes, aes(fill = "Lakes", color = "Lakes"), show.legend = TRUE, key_glyph = draw_key_rect) +
-  geom_sf(data = fire1, fill = NA, aes(color = "Fire1"), size = 1, show.legend = TRUE, key_glyph = draw_key_rect) +
-  geom_sf(data = fire2, fill = NA, aes(color = "Fire2"), size = 1, show.legend = TRUE) +
-  geom_sf(data = fire3, fill = NA, aes(color = "Fire3"), size = 1, show.legend = TRUE) +
-  scale_color_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = "#b82b2b", "Fire2" = "#b06f0c", "Fire3" =  "#dd7116"), 
-                       labels = c("British Columbia", "Chelaslie fire", "Entiako fire", "Tweedsmuir fire", "Lakes", "Provincial parks"),
-                       name = "Legend") +
-  scale_fill_manual(values = c("BC" = "#E8E8E8", "Parks" = "#C3ECB2", "Lakes" = "#AADAFF", "Fire1" = NA, "Fire2" = NA, "Fire3" =  NA),
-                    guide=FALSE) +
-  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
-      annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") +
-    annotation_north_arrow(location = "tl", which_north = "true", 
-        pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
-        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
-  theme(axis.text.x = element_text(face = "plain", color = "black", size = 12),
-        axis.text.y = element_text(face = "plain", color = "black", size = 12),
-        legend.position= c(0.88, 0.35),
-        legend.key = element_rect(fill = "white")) 
-
-
-map_legend
-```
 
 Colors:
 -- gray green #75816B
@@ -209,49 +164,8 @@ Colors:
 -- Gray #7E7E7E
 -- dark slate #3F4354
 
-```{r}
-map_legend2 = ggplot() +
-  geom_sf(data = bc, aes(fill = "BC", color = "BC")) +
-    geom_sf(data = parks, aes(fill = "Parks", color = "Parks"), show.legend = TRUE) +
-    geom_sf(data = lakes, aes(fill = "Lakes", color = "Lakes"), show.legend = TRUE, key_glyph = draw_key_rect) +
-  geom_sf(data = fire1, fill = NA, aes(color = "Fire1"), size = 1, show.legend = TRUE, key_glyph = draw_key_rect) +
-  geom_sf(data = fire2, fill = NA, aes(color = "Fire2"), size = 1, show.legend = TRUE) +
-  geom_sf(data = fire3, fill = NA, aes(color = "Fire3"), size = 1, show.legend = TRUE) +
-  scale_color_manual(values = c("BC" = "#7E7E7E", "Parks" = "#75816B", "Lakes" = "#AADAFF", "Fire1" = "#fee08b", "Fire2" = "#ff6347", "Fire3" ="#fdae61" ), 
-                       labels = c("British Columbia", "Chelaslie fire", "Entiako fire", "Tweedsmuir fire", "Lakes", "Provincial parks"),
-                       name = "") +
-  scale_fill_manual(values = c("BC" = "#7E7E7E", "Parks" = "#75816B", "Lakes" = "#AADAFF", "Fire1" = NA, "Fire2" = NA, "Fire3" =  NA),
-                    guide=FALSE) +
-  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
-      annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") +
-    annotation_north_arrow(location = "br", which_north = "true", 
-        pad_x = unit(0.4, "in"), pad_y = unit(0.5, "in"),
-        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
-  theme(axis.text.x = element_text(face = "plain", color = "black", size = 10),
-        axis.text.y = element_text(face = "plain", color = "black", size = 10),
-        legend.position= "bottom",
-        legend.key = element_rect(fill = "white")) 
 
 
-map_legend2
-```
-
-### Combine with inset map
-```{r fig.height=4, fig.width=6}
-
-fig_manuscript2 = ggdraw() +
-   draw_plot(map_legend2) +
-  draw_plot(map_bc2, x = 0.12, y = 0.32, width = .25, height = .25) 
- 
-
-fig_manuscript2
-
-
-```
-
-```{r}
-ggsave("../figures/2021-01-19_bc_map_manuscript.png", plot = fig_manuscript2, width = 6, height = 4, dpi = 600)
-```
 
 
 
@@ -319,23 +233,3 @@ fig_man3
 ggsave("../figures/BCStudyArea.png", plot = fig_man3, width = 6, height = 4, dpi = 600)
 ```
 
-# Poster
-```{r}
-map_fires = ggplot() +
-  geom_sf(data = bc, fill = "#E8E8E8", color = "#E8E8E8") +
-    geom_sf(data = parks, fill = "#C3ECB2", color = "#C3ECB2") +
-    geom_sf(data = lakes, fill = "#AADAFF", color = "#AADAFF") +
-  geom_sf(data = fire1, fill = NA, color = "#b82b2b", size = 1) +
-  geom_sf(data = fire2, fill = NA, color = "#b06f0c", size = 1) +
-  geom_sf(data = fire3, fill = NA, color = "#dd7116", size = 1) +
-  coord_sf(crs = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs", xlim = c(983000, 1071000), ylim = c(892000, 941000), expand = FALSE)  + 
-      annotation_scale(location = "br", width_hint = 0.25, text_size = 12, text_face = NULL, text_family = "serif", text_col = "black") +
-    annotation_north_arrow(location = "br", which_north = "true", 
-        pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
-        style = north_arrow_nautical(line_width = 1, line_col = "black", fill = c("black", "white"), text_size = 10, text_face = NULL, text_family = "serif", text_col = "black", text_angle = 0)) +
-  theme(axis.text.x = element_text(face = "plain", color = "black", size = 12),
-        axis.text.y = element_text(face = "plain", color = "black", size = 12)) 
-
-
-map_fires
-```
